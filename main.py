@@ -37,7 +37,7 @@ db=mysql.connector.connect(
         password='',
         database='qpfinder',
     )
-nopes=['undefined','null','',"",'Null','NaN',]
+nopes=['undefined','null','','',"",'Null','NaN',]
 def validate(data):
     if data in nopes:
         return 'All'
@@ -65,7 +65,7 @@ def check_user():
     res=mycursor.fetchall()
     print(res)
     if len(res)>0:
-        return jsonify({'result':True})
+        return jsonify({'result':list(res[0])})
     else:
         return jsonify({'result':False})
     
@@ -73,12 +73,15 @@ def check_user():
 def add_data():
     mycursor=db.cursor()
     mycursor.execute("SELECT username from users;")
-    unames=mycursor.fetchall()[0]
+    fall=mycursor.fetchall()
+    print(fall)
+    if len(fall[0])>0:
+        fall=fall[0]
     data=json.loads(request.data)
     if request.method=='POST':
-        if data['uname'] in unames:
+        if data['uname'] in fall:
             return jsonify({'result':'nuname'})
-        mycursor.execute("INSERT INTO users(username,email,role,organization) VALUES('"+data['uname']+"','"+data['email']+"','"+data['role']+"','"+data['organization_name']+"');")
+        mycursor.execute("INSERT INTO users(username,email,role,branch,organization) VALUES('"+data['uname']+"','"+data['email']+"','"+data['role']+"','"+data['branch']+"','"+data['organization_name']+"');")
         db.commit()
         print(mycursor.fetchall())
     return jsonify({'result':True})
