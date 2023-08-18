@@ -11,10 +11,6 @@ from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseUpload
 import io
 from PIL import Image
-
-app = Flask(__name__)
-CORS(app)
-
 # Google Sheets API setup
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/drive.file']
 SERVICE_ACCOUNT_FILE = 'data-382620-a930fbe4097f.json'  # Replace with the actual path to your Service Account Key JSON file
@@ -56,7 +52,8 @@ def convert_jpg_to_pdf(img_stream, pdf_filename):
     pdf_stream = io.BytesIO()
     img.save(pdf_stream, "PDF")
     return pdf_stream, pdf_filename
-
+app = Flask(__name__)
+CORS(app)
 @app.route('/',methods=['GET'])
 def check_user():
     mycursor=db.cursor()
@@ -92,7 +89,7 @@ def append_to_google_sheet(spreadsheet_id, data):
         'values': values
     }
 
-    range_ = 'main!A:J'
+    range_ = 'main!A:K'
 
     sheets_service.spreadsheets().values().append(
         spreadsheetId=spreadsheet_id,
@@ -116,6 +113,7 @@ def upload():
         user=request.form['uname']
         role=request.form['role']
         verified=request.form['verified']
+        branch=request.form['branch']
 
 
         if file.filename.lower().endswith(('jpg', 'jpeg','png')):
@@ -127,7 +125,7 @@ def upload():
         
         # media = MediaIoBaseUpload(io.BytesIO(file.read()), mimetype=file.content_type)
         file_metadata = {
-            'name': str(year)+' '+str(sem)+' '+str(subject)+' '+str(year)+' '+str(type_)+' '+str(subject)+' '+str(institute)+'.pdf',
+            'name': str(year)+' '+str(sem)+' '+str(branch)+' '+str(subject)+' '+str(year)+' '+str(type_)+' '+str(subject)+' '+str(institute)+'.pdf',
             'parents': ['1brGN4ddiI0W5-bEJ_soI0WoTiUu0zDCW']
         }
 
@@ -136,7 +134,7 @@ def upload():
             media_body=media,
             fields='id'
         ).execute()
-        data = [validate(institute), validate(year), validate(subject), validate(type_), validate(time), validate(sem), validate(uploaded_file['id']),validate(user),validate(role),validate(verified)]
+        data = [validate(institute), validate(year), validate(subject), validate(type_), validate(time), validate(sem), validate(uploaded_file['id']),validate(user),validate(role),validate(verified),validate(branch) ]
         append_to_google_sheet(spreadsheet_id, data)
 
         return jsonify({'message': 'File uploaded and data recorded successfully.with id: '+uploaded_file.get("id")}), 200
