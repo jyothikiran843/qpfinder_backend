@@ -28,10 +28,11 @@ creds = service_account.Credentials.from_service_account_file(
 service = build('drive', 'v3', credentials=creds)
 
 db=mysql.connector.connect(
-        host='127.0.0.1',
-        user='root',
-        password='',
-        database='qpfinder',
+        host='db4free.net',
+        user='jyothikiran',
+        password='jkiran@root',
+        database='samplejyothikira',
+        port='3306',
     )
 nopes=['undefined','null','','',"",'Null','NaN',]
 def validate(data):
@@ -98,10 +99,9 @@ def append_to_google_sheet(spreadsheet_id, data):
         body=body
     ).execute()
 
-
-
 @app.route('/upload', methods=['POST'])
 def upload():
+    print("Upload clicked")
     try:
         institute = request.form['institute']
         year = request.form['year']
@@ -141,5 +141,4 @@ def upload():
     except Exception as e:
         print('Error occurred:', e)
         return jsonify({'error': 'Error occurred during file upload and data recording.'}), 500
-
 app.run(port=3790)
