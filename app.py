@@ -141,4 +141,5 @@ def upload():
     except Exception as e:
         print('Error occurred:', e)
         return jsonify({'error': 'Error occurred during file upload and data recording.'}), 500
-app.run(port=3790)
+if __name__ == '__main__':
+    app.run(3790)
